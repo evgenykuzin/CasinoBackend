@@ -167,7 +167,7 @@ class TapController {
                 println("get score: ${it.path()}")
                 val currScore = storage.score ?: 0L
                 println("Get Score: $currScore")
-                ServerResponse.ok().bodyValue(GetCurrentScoreResponse(currScore)).block()!!
+                ServerResponse.ok().json().bodyValue(GetCurrentScoreResponse(currScore)).block()!!
             }
 
             POST(taps.upgrade) {
@@ -181,7 +181,7 @@ class TapController {
             }
 
             GET(taps.friends) {
-                ServerResponse.ok().bodyValue(
+                ServerResponse.ok().json().bodyValue(
                     GetFriendsListResponse(
                         storage.friends ?: listOf()
                     )
@@ -191,7 +191,7 @@ class TapController {
 
         games nest {
             GET(games.search) {
-                ServerResponse.ok().bodyValue(
+                ServerResponse.ok().json().bodyValue(
                     GamesSearchRs(
                         storage.games ?: listOf()
                     )
