@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.web.reactive.config.EnableWebFlux
 
 @SpringBootApplication
-@EnableWebFlux
+//@EnableWebFlux
 //@EnableJpaRepositories
 open class Application
 

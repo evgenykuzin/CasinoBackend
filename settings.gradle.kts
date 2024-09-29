@@ -40,4 +40,4 @@ dependencyResolutionManagement {
 
 
 include(":casinoBackend")
-//include(":casinoFrontend")
+include(":casinoFrontend")

@@ -1,84 +1,53 @@
 package ru.jekajops.casino.controller
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.reactive.function.server.RouterFunction
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.bodyToMono
-import org.springframework.web.reactive.function.server.coRouter
+import org.springframework.web.reactive.function.server.*
 //import org.springframework.web.servlet.function.server.ServerResponse
 
 import ru.jekajops.casino.*
-import java.util.function.Consumer
+import ru.jekajops.casino.tools.Path
+import ru.jekajops.casino.tools.ROOT
+import ru.jekajops.casino.tools.asPath
 
 @Configuration
-//@RestController
-//@RequestMapping("/taps")
 class TapController {
-
-    companion object {
-        fun node(path: String, dsl: Node.() -> Unit) {
-            Node(path, dsl)
-        }
-
-    }
-
-    class Node(val path: String, dsl: Node.() -> Unit) {
-        val children: MutableSet<Node> = mutableSetOf()
-
-        protected fun endpoint(path: String) {
-            children.add(Node(path, {}))
-        }
-        protected fun endpoint(path: String, dsl: Node.() -> Unit) {
-            children.add(Node(path, dsl))
-        }
-        init {
-            dsl()
-        }
-        companion object {
-            val TAPS = node("/taps") {
-                endpoint("/score") {
-                    endpoint("/")
-                }
-            }
-        }
-    }
-    interface Naming {
-
-    }
-    val <T : Path> T.name: String get() = (this::class.simpleName?.lowercase() ?: "").let {
-        "/${it}"
-    }
-    sealed class Path : Naming {
-        object TAS : Path()
-        sealed class Taps : Path() {
-            sealed class Score : Path()
-        }
-        sealed class Game : Path()
-    }
 
     val storage = mutableMapOf<String, Any>()
 
+    final inline fun <reified T : Any> getter(name: String, orDefault: () -> T) = storage[name] as? T ?: orDefault().also {
+        storage[name] = it
+    }
+
+    final inline fun <reified T : Any> T.setter(name: String, ) {
+        storage[name] = this
+    }
+
     var MutableMap<String, Any>.score: Long?
-        get() = storage["score"] as? Long
+        get() = getter("score") { 0 }
         set(value) {
-            storage["score"] = value as Long
+            value?.setter("score")
         }
 
     var MutableMap<String, Any>.users: List<User>?
-        get() = storage["users"] as? List<User>? ?: listOf<User>().also { storage["users"] = it }
+        get() = getter("users") { listOf() }
         set(value) {
-            storage["users"] = value as List<User>
+            value?.setter("users")
         }
 
     var MutableMap<String, Any>.friends: List<FriendInfo>?
-        get() = storage["friends"] as? List<FriendInfo>? ?: listOf<FriendInfo>().also { storage["friends"] = it }
+        get() = getter("friends") { listOf() }
         set(value) {
-            storage["friends"] = value as List<FriendInfo>
+            value?.setter("friends")
+        }
+
+    var MutableMap<String, Any>.games: List<Game>?
+        get() = getter("games") { listOf() }
+        set(value) {
+            value?.setter("games")
         }
 
     init {
@@ -108,43 +77,145 @@ class TapController {
                 false
             ),
         )
+
+        storage.games = listOf(
+            Game("Темка верняк", listOf(
+                User(
+                    "1",
+                    "1234567890",
+                    "Patric",
+                    "Batman",
+                    "patman666xx",
+                    ""
+                ),
+                User(
+                    "2",
+                    "0987654321",
+                    "Vitya",
+                    "AK47",
+                    "ak47vitek",
+                    ""
+                ),
+                User(
+                    "3",
+                    "1234509876",
+                    "Сисястая",
+                    "Стейси",
+                    "e.anastasja",
+                    "89523663611"
+                ),
+
+            )),
+            Game("Темка на лям", listOf(
+                User(
+                    "1",
+                    "1234567890",
+                    "Жека",
+                    "Джопс",
+                    "jekajops",
+                    ""
+                ),
+                User(
+                    "2",
+                    "0987654321",
+                    "Vitya",
+                    "AK47",
+                    "ak47vitek",
+                    ""
+                ),
+                User(
+                    "3",
+                    "1234509876",
+                    "Сисястая",
+                    "Стейси",
+                    "e.anastasja",
+                    "89523663611"
+                ),
+
+                ))
+        )
     }
 
     @Bean
-    suspend fun controller(): RouterFunction<ServerResponse> {
-        return coRouter {
-           Path.Taps().name.nest {
-                POST("/score/") {
-                    it.bodyToMono<SendCurrentScoreRequest>().map {
-                        println("SendCurrentScoreRequest: $it")
-                        storage.score = it.score
-                    }.flatMap {
-                        ServerResponse.ok().bodyValue("OK")
-                    }.block()!!
-                }
+    @FlowPreview
+    fun controller() = coRouter {
+        infix fun Path.nest(r: CoRouterFunctionDsl.() -> Unit) = asPath.nest(r)
 
-                GET("/score/") {
-                    val currScore = storage.score ?: 0L
-                    println("Get Score: $currScore")
-                    ServerResponse.ok().bodyValue(GetCurrentScoreResponse(currScore)).block()!!
-                }
+        fun CoRouterFunctionDsl.POST(path: Path, f: suspend (ServerRequest) -> ServerResponse) {
+            this.POST(path.asPath, f)
+        }
 
-                POST("/upgrade/") {
-                    ServerResponse.ok().bodyValue(UpgradeResponse(createInvoiceLink(
-                        storage.users?.first()?.telegramId ?: "213390901"
-                    ))).block()!!
-                }
+        fun CoRouterFunctionDsl.GET(path: Path, f: suspend (ServerRequest) -> ServerResponse) {
+            this.GET(path.asPath, f)
+        }
 
-                GET("/friends/") {
-                    ServerResponse.ok().bodyValue(
-                        GetFriendsListResponse(
-                            storage.friends ?: listOf()
+        GET(ROOT) {
+            ServerResponse.ok().bodyValue("OK").block()!!
+        }
+
+        taps nest {
+            POST(taps.score) {
+                it.bodyToMono<SendCurrentScoreRequest>().map {
+                    println("SendCurrentScoreRequest: $it")
+                    storage.score = it.score
+                }.flatMap {
+                    ServerResponse.ok().bodyValue("OK")
+                }.block()!!
+            }
+
+            GET(taps.score) {
+                println("get score: ${it.path()}")
+                val currScore = storage.score ?: 0L
+                println("Get Score: $currScore")
+                ServerResponse.ok().bodyValue(GetCurrentScoreResponse(currScore)).block()!!
+            }
+
+            POST(taps.upgrade) {
+                ServerResponse.ok().bodyValue(
+                    UpgradeResponse(
+                        createInvoiceLink(
+                            storage.users?.first()?.telegramId ?: "213390901"
                         )
-                    ).block()!!
-                }
+                    )
+                ).block()!!
+            }
+
+            GET(taps.friends) {
+                ServerResponse.ok().bodyValue(
+                    GetFriendsListResponse(
+                        storage.friends ?: listOf()
+                    )
+                ).block()!!
+            }
+        }
+
+        games nest {
+            GET(games.search) {
+                ServerResponse.ok().bodyValue(
+                    GamesSearchRs(
+                        storage.games ?: listOf()
+                    )
+                ).block()!!
+            }
+
+            POST(games.join) {
+                ServerResponse.ok().bodyValue(
+                    "OK"
+                ).block()!!
             }
         }
     }
+
+    @Serializable
+    data class Game(
+        val name: String,
+        val users: List<User>
+    )
+
+    @Serializable
+    data class GamesSearchRs(
+        val games: List<Game>
+    )
 
 //    @PostMapping("/score/")
 //    fun postScore(
@@ -155,7 +226,7 @@ class TapController {
 //        storage.score = scsr.score
 //        return ResponseEntity.ok("OK")
 //    }
-//
+
 //    @GetMapping("/score/")
 //    fun getScore(
 ////        @RequestHeader initData: String,
