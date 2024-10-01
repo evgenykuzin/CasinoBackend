@@ -1,22 +1,22 @@
 package ru.jekajops.casino
 
-import org.hibernate.annotations.Where
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
-//@Repository
+@Repository
 interface GameRepository
-    //: CrudRepository<Game, String>
+    : CrudRepository<Game, String>
 {
-//    operator fun get(key: String): Game? = findByIdOrNull(key)
-//    operator fun set(gameId: String, game: Game) {
-//        //game.id = gameId
-//        save(game)
-//    }
+    operator fun get(key: String): Game? = findByIdOrNull(key)
+    operator fun set(gameId: String, game: Game) {
+        //game.id = gameId
+        save(game)
+    }
 
     @Query("select g from Game g where g.maxPlayers > g.participants.size and g.startedAt is null and g.status = 0")
     fun findByMaxPlayersGreaterThan(): List<Game>
@@ -40,43 +40,43 @@ interface GameRepository
 
 }
 
-//@Repository
+@Repository
 interface ResultRepository
-    //: CrudRepository<Result, String>
+    : CrudRepository<Result, String>
 {
-//    operator fun get(key: String): Result? = findByIdOrNull(key)
-//    operator fun set(gameId: String, game: Result) {
-//        //game.id = gameId
-//        save(game)
-//    }
+    operator fun get(key: String): Result? = findByIdOrNull(key)
+    operator fun set(gameId: String, game: Result) {
+        //game.id = gameId
+        save(game)
+    }
 
     fun findTopByGameId(gameId: String): Result?
 
 }
 
-//@Repository
+@Repository
 interface ParticipantRepository
-    //: CrudRepository<Participant, String>
+    : CrudRepository<Participant, String>
 {
-//    operator fun get(key: String): Participant? = findByIdOrNull(key)
-//    operator fun set(gameId: String, game: Participant) {
-//        //game.id = gameId
-//        save(game)
-//    }
+    operator fun get(key: String): Participant? = findByIdOrNull(key)
+    operator fun set(gameId: String, game: Participant) {
+        //game.id = gameId
+        save(game)
+    }
 
-    //fun findTopByGame(game: Game): Participant?
+    fun findTopByGame(game: Game): Participant?
 
 }
 
-//@Repository
+@Repository
 interface UserRepository
-    //: CrudRepository<User, String>
+    : CrudRepository<User, String>
 {
-    //operator fun get(key: String): User? = findByIdOrNull(key)
-//    operator fun set(gameId: String, game: User) {
-//        //game.id = gameId
-//        save(game)
-//    }
+    operator fun get(key: String): User? = findByIdOrNull(key)
+    operator fun set(gameId: String, game: User) {
+        //game.id = gameId
+        save(game)
+    }
 
 
     fun findByBalanceLessThan(balance: Double): List<User>
