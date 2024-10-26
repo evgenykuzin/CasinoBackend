@@ -3,9 +3,6 @@ package ru.jekajops.casino.config
 import io.r2dbc.h2.H2ConnectionConfiguration
 import io.r2dbc.h2.H2ConnectionFactory
 import io.r2dbc.spi.ConnectionFactory
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -22,7 +19,7 @@ class R2dbcConfig : AbstractR2dbcConfiguration() {
     override fun connectionFactory(): ConnectionFactory =
         H2ConnectionFactory(
             H2ConnectionConfiguration.builder()
-                .file("/Users/anastasia/IdeaProjects/CasinoBackend/casinoBackend/src/main/resources/newdb")
+                .file("./src/main/resources/newdb")
                 .username("qwe123")
                 .password("qwe123")
                 .build()
