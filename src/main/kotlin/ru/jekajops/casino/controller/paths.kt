@@ -48,7 +48,7 @@ object users : Path() {
     object gameParticipants : Path(users)
 }
 
-fun main() {
+fun test() {
     fun Path.printFull() = also { println(it.asFullPath) }
     fun Path.print() = also { println(it.asPath) }
 
