@@ -1,7 +1,7 @@
 {
   "games": [
     {
-      "id": "1",
+      "id": 1,
       "name": "Game1",
       "adminId": "13",
       "minPlayers": 2,
@@ -10,14 +10,14 @@
       "gameType": "ONE_WINNER",
       "participants": [
         {
-          "gameId": "1",
-          "userId": "1",
+          "gameId": 1,
+          "userId": 1,
           "betAmount": 10.0,
           "status": "PENDING"
         },
         {
-          "gameId": "1",
-          "userId": "2",
+          "gameId": 1,
+          "userId": 2,
           "betAmount": 20.0,
           "status": "PENDING"
         }
@@ -25,29 +25,29 @@
       "status": "CREATED"
     },
     {
-      "id": "2",
+      "id": 2,
       "name": "Game2",
-      "adminId": "13",
+      "adminId": 1,
       "minPlayers": 3,
       "maxPlayers": 6,
       "minBet": 200,
       "gameType": "TOP3_WINNERS",
       "participants": [
         {
-          "gameId": "2",
-          "userId": "1",
+          "gameId": 2,
+          "userId": 1,
           "betAmount": 200.0,
           "status": "PENDING"
         },
         {
-          "gameId": "2",
-          "userId": "2",
+          "gameId": 2,
+          "userId": 2,
           "betAmount": 300.0,
           "status": "PENDING"
         },
         {
-          "gameId": "2",
-          "userId": "13",
+          "gameId": 2,
+          "userId": 13,
           "betAmount": 200.0,
           "status": "PENDING"
         }
@@ -55,29 +55,29 @@
       "status": "CREATED"
     },
     {
-      "id": "3",
+      "id": 3,
       "name": "Game3",
-      "adminId": "13",
+      "adminId": 13,
       "minPlayers": 3,
       "maxPlayers": 4,
       "minBet": 100,
       "gameType": "RANDOM_WINNERS",
       "participants": [
         {
-          "gameId": "3",
-          "userId": "1",
+          "gameId": 3,
+          "userId": 1,
           "betAmount": 200.0,
           "status": "PENDING"
         },
         {
-          "gameId": "3",
-          "userId": "2",
+          "gameId": 3,
+          "userId": 2,
           "betAmount": 300.0,
           "status": "PENDING"
         },
         {
-          "gameId": "3",
-          "userId": "13",
+          "gameId": 3,
+          "userId": 13,
           "betAmount": 200.0,
           "status": "PENDING"
         }
@@ -86,7 +86,7 @@
   ],
   "users": [
     {
-      "id": "1",
+      "id": 1,
       "telegramId": 12345,
       "firstName": "John",
       "lastName": "Doe",
@@ -97,7 +97,7 @@
       "deleted": false
     },
     {
-      "id": "2",
+      "id": 2,
       "telegramId": 67890,
       "firstName": "Jane",
       "lastName": "Doe",

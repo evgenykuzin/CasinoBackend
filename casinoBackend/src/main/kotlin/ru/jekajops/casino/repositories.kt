@@ -1,40 +1,43 @@
 package ru.jekajops.casino
 
-import org.springframework.data.jpa.repository.Modifying
-import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.findByIdOrNull
+import org.springframework.data.r2dbc.repository.Modifying
+import org.springframework.data.r2dbc.repository.Query
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Flux
+import java.math.BigInteger
 
-@Repository
+//@Repository
+@Service
 interface GameRepository
-    : CrudRepository<Game, String>
-{
-    operator fun get(key: String): Game? = findByIdOrNull(key)
-    operator fun set(gameId: String, game: Game) {
-        //game.id = gameId
-        save(game)
-    }
+    : CoroutineCrudRepository<Game, Long> {
+//    operator fun get(key: String): Game? = findByIdOrNull(key)
+//    operator fun set(gameId: String, game: Game) {
+//        //game.id = gameId
+//        save(game)
+//    }
 
-    @Query("select g from Game g where g.maxPlayers > g.participants.size and g.startedAt is null and g.status = 0")
-    fun findByMaxPlayersGreaterThan(): List<Game>
 
-    fun findByAdminId(adminId: String): List<Game>
+    @Query("select * from Game g where max_players > (select count(game_id) from participant where game_id = g.id) and started_at is null and status = 'CREATED'")
+    fun findByMaxPlayersGreaterThan(): Flux<Game>
 
-    fun findByParticipants_UserIdAndStatusIn(
-        participants_userId: String,
-        status: MutableCollection<GameStatus> = mutableListOf(
-            GameStatus.CREATED,
-            GameStatus.IN_PROGRESS
-        )
-    ): List<Game>
+    fun findByAdminId(adminId: Long): Flux<Game>
+
+//    fun findByParticipants_UserIdAndStatusIn(
+//        participants_userId: Long,
+//        status: MutableCollection<GameStatus> = mutableListOf(
+//            GameStatus.CREATED,
+//            GameStatus.IN_PROGRESS
+//        )
+//    ): List<Game>
 
     @Transactional
     @Modifying
-    @Query("update Game g set g.status = ?1 where g.id = ?2")
-    fun updateStatusById(status: GameStatus, id: String)
+    @org.springframework.data.r2dbc.repository.Query("update Game g set g.status = ?1 where g.id = ?2")
+    fun updateStatusById(status: GameStatus, id: Long)
 
     fun findAllByStatusIn(status: MutableCollection<GameStatus>)
 
@@ -42,62 +45,69 @@ interface GameRepository
 
 @Repository
 interface ResultRepository
-    : CrudRepository<Result, String>
+    : CoroutineCrudRepository<Result, Long>
 {
-    operator fun get(key: String): Result? = findByIdOrNull(key)
-    operator fun set(gameId: String, game: Result) {
-        //game.id = gameId
-        save(game)
-    }
+//    operator fun get(key: String): Result? = findByIdOrNull(key)
+//    operator fun set(gameId: String, game: Result) {
+//        //game.id = gameId
+//        save(game)
+//    }
 
-    fun findTopByGameId(gameId: String): Result?
+    fun findTopByGameId(gameId: Long): Result?
 
 }
 
 @Repository
 interface ParticipantRepository
-    : CrudRepository<Participant, String>
+    : CoroutineCrudRepository<Participant, Long>
 {
-    operator fun get(key: String): Participant? = findByIdOrNull(key)
-    operator fun set(gameId: String, game: Participant) {
-        //game.id = gameId
-        save(game)
-    }
+    @org.springframework.data.jpa.repository.Query("select p from Participant p where p.userId = ?1")
+    suspend fun findByUserId(userId: Long): Flux<Participant>
+//    operator fun get(key: String): Participant? = findByIdOrNull(key)
+//    operator fun set(gameId: String, game: Participant) {
+//        //game.id = gameId
+//        save(game)
+//    }
 
     fun findTopByGame(game: Game): Participant?
 
+    suspend fun findAllByGame_Id(gameId: Long): Flux<Participant>
+
+    suspend fun existsByGameAndUserId(game: Game, userId: Long): Boolean
+
+   // suspend fun participants(game: Game): Flux<Participant>? = game.id?.let { findAllByGame_Id(it) }
 }
 
 @Repository
 interface UserRepository
-    : CrudRepository<User, String>
+    : CoroutineCrudRepository<User, Long>
 {
-    operator fun get(key: String): User? = findByIdOrNull(key)
-    operator fun set(gameId: String, game: User) {
-        //game.id = gameId
-        save(game)
-    }
+//    operator fun get(key: String): User? = findByIdOrNull(key)
+//    operator fun set(gameId: String, game: User) {
+//        //game.id = gameId
+//        save(game)
+//    }
 
 
-    fun findByBalanceLessThan(balance: Double): List<User>
+    suspend fun findByBalanceLessThan(balance: BigInteger): List<User>
 
-    fun findByTelegramId(telegramId: String): User?
+    suspend fun findByTelegramId(telegramId: String): User?
 
-    fun findByUsername(username: String): User?
+    suspend fun findByUsername(username: String): User?
 
     @Query(
         "SELECT DISTINCT * FROM User INNER JOIN PARTICIPANT ON User.id = PARTICIPANT.USER_ID" +
-                " WHERE PARTICIPANT.GAME_ID = :gameId", nativeQuery = true
+                " WHERE PARTICIPANT.GAME_ID = :gameId"
     )
-    fun findUsersByGameId(@Param("gameId") gameId: String?): List<User>
+    suspend fun findUsersByGameId(@Param("gameId") gameId: Long?): List<User>
 
     @Transactional
     @Modifying
     @Query("UPDATE User u SET u.balance = u.balance + :amount WHERE u.id = :userId")
-    fun increaseUserBalance(@Param("userId") userId: String, @Param("amount") amount: Double)
+    suspend fun increaseUserBalance(@Param("userId") userId: Long, @Param("amount") amount: BigInteger)
 
     @Transactional
     @Modifying
     @Query("UPDATE User u SET u.balance = u.balance - :amount WHERE u.id = :userId")
-    fun decreaseUserBalance(@Param("userId") userId: String, @Param("amount") amount: Double)
+    suspend fun decreaseUserBalance(@Param("userId") userId: Long, @Param("amount") amount: BigInteger)
 }

@@ -14,7 +14,7 @@ fun error(status: Int, desc: String): Response {
     return Response(status, desc)
 }
 
-fun response(block:() -> ResponseEntity<Response>): ResponseEntity<Response> {
+inline fun response( block:() -> ResponseEntity<Response>): ResponseEntity<Response> {
     return try {
         block()
     } catch (t: Throwable) {

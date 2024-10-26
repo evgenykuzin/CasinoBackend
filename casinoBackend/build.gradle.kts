@@ -19,6 +19,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 
     //implementation("org.springframework.boot:spring-boot-starter")
     //implementation("org.springframework.boot:spring-boot-autoconfigure")
@@ -26,8 +27,12 @@ dependencies {
     //implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-
-    implementation("com.h2database:h2:1.4.200")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("io.r2dbc:r2dbc-h2")
+    //implementation("com.h2database:h2:1.4.200")
+    //implementation("org.springframework.boot:spring-boot-actuator-autoconfigure-r2dbc")
+    //implementation("io.r2dbc:r2dbc-postgresql:0.8.0.M8")
+    //implementation("io.r2dbc:r2dbc-pool")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.4")
 
@@ -36,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 //publishing {

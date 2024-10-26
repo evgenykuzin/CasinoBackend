@@ -21,8 +21,12 @@ inline fun <reified P : Path> CoRouterFunctionDsl.POST(path: P, predicate: Reque
     return POST(path.asPath, predicate, f)
 }
 
-inline fun <reified P : Path> CoRouterFunctionDsl.GET(path: P, noinline f: suspend (ServerRequest) -> ServerResponse) {
-    return GET(path.asPath, f)
+inline fun <reified P : Path> CoRouterFunctionDsl.GET(
+    path: P,
+    pathVariables: String? = null,
+    noinline f: suspend (ServerRequest) -> ServerResponse
+) {
+    return GET(path.asPath + (pathVariables?: "") , f)
 }
 
 inline fun <reified P : Path> CoRouterFunctionDsl.PUT(path: P, noinline f: suspend (ServerRequest) -> ServerResponse) {

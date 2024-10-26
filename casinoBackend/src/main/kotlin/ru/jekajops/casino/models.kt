@@ -1,28 +1,27 @@
 package ru.jekajops.casino
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.type.TypeFactory
-import com.fasterxml.jackson.databind.util.Converter
 import jakarta.persistence.*
 import org.hibernate.Hibernate
 import java.time.Instant
+import org.springframework.data.relational.core.mapping.Table
+import java.math.BigInteger
 import kotlin.jvm.Transient
 
-@Entity
+@Entity(name = "user_g")
+@Table("user_g")
 data class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String? = null,
+    @org.springframework.data.annotation.Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    var id: Long? = null,
     var telegramId: String? = null,
     var firstName: String? = null,
     var lastName: String? = null,
     var username: String? = null,
     var phone: String? = null,
-    var balance: Double = 0.0,
+    var avatar: String? = null,
+    var balance: BigInteger = BigInteger.ZERO,
     var credit: Int = 0,
     var deleted: Boolean = false,
     var timestamp: Instant? = null
@@ -54,18 +53,21 @@ enum class GameType {
 }
 
 @Entity
+@Table
 data class Game(
     @Id
+    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String? = null,
+    var id: Long? = null,
     var name: String = "Game",
-    var adminId: String? = "13",
+    var adminId: Long? = null,
     var minPlayers: Int = 2,
     var maxPlayers: Int = 5,
-    var minBet: Double = 1.0,
+    var minBet: BigInteger = BigInteger.TEN,
     var gameType: GameType = GameType.ONE_WINNER,
-    @OneToMany(cascade = [CascadeType.ALL])
-    var participants: MutableList<Participant> = mutableListOf(),
+    //@OneToMany(cascade = [CascadeType.PERSIST])
+    //@org.springframework.data.annotation.Transient
+//    var participants: MutableList<Participant>? = null,
     var startedAt: Instant? = null,
     var status: GameStatus = GameStatus.CREATED
 ) {
@@ -81,27 +83,29 @@ data class Game(
     override fun hashCode(): Int = javaClass.hashCode()
 
     override fun toString(): String {
-        return "Game(id=$id, name='$name', adminId=$adminId, minPlayers=$minPlayers, maxPlayers=$maxPlayers, minBet=$minBet, gameType=$gameType, participants=$participants, startedAt=$startedAt, status=$status)"
+        return "Game(id=$id, name='$name', adminId=$adminId, minPlayers=$minPlayers, maxPlayers=$maxPlayers, minBet=$minBet, gameType=$gameType, startedAt=$startedAt, status=$status)"
     }
 
 
 }
 
 @Entity
+@Table
 data class Participant(
     @Id
+    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String? = null,
-    @ManyToOne(cascade = [CascadeType.ALL])
+    var id: Long? = null,
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "GAME_ID", referencedColumnName = "ID")
     var game: Game? = null,
-    var userId: String? = null,
-    var betAmount: Double? = null,
+    var userId: Long? = null,
+    var betAmount: BigInteger? = null,
     var status: ParticipantStatus = ParticipantStatus.PENDING
 ) {
 
     @JsonProperty("game")
-    fun getGameId(): String? {
+    fun getGameId(): Long? {
         return game?.id
     }
 
@@ -144,14 +148,17 @@ enum class ParticipantStatus { PENDING, IN_PROGRESS, COMPLETE }
 enum class GameStatus { CREATED, IN_PROGRESS, COMPLETE }
 
 @Entity
+@Table
 data class Result(
     @Id
+    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String? = null,
-    var gameId: String? = null,
+    var id: Long? = null,
+    var gameId: Long? = null,
 //    @OneToMany
 //    var winnerIds: List<Participant> = mutableListOf(),
-    @OneToMany(cascade = [CascadeType.ALL])
+    //@OneToMany(cascade = [CascadeType.ALL])
+    @Transient
     var resultAmounts: List<ResultAmount> = mutableListOf(),
 //    @ElementCollection
 //    var winnersAmount: List<Double?> = mutableListOf(),
@@ -177,17 +184,19 @@ data class Result(
 }
 
 @Entity
+@Table
 data class ResultAmount(
     @Id
+    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String? = null,
+    var id: Long? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "resultId", referencedColumnName = "id")
     var result: Result? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "participantId", referencedColumnName = "id")
     var participant: Participant? = null,
-    var amount: Double? = 0.0
+    var amount: BigInteger? = BigInteger.ZERO
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

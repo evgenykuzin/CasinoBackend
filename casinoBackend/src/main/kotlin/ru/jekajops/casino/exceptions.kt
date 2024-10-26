@@ -1,10 +1,10 @@
 package ru.jekajops.casino
 
-class UserNotFoundException(val telegramId: Int) : Throwable() {
+class UserNotFoundException(val telegramId: String) : Throwable() {
 
 }
 
-class NotEnoughBalanceException(val userId: String) : Throwable() {
+class NotEnoughBalanceException(val userId: Long) : Throwable() {
 
 }
 

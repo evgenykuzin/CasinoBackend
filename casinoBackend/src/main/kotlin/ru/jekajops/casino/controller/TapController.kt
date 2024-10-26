@@ -81,7 +81,7 @@ class TapController {
         storage.games = listOf(
             Game("Темка верняк", listOf(
                 User(
-                    "1",
+                    1,
                     "1234567890",
                     "Patric",
                     "Batman",
@@ -89,7 +89,7 @@ class TapController {
                     ""
                 ),
                 User(
-                    "2",
+                    2,
                     "0987654321",
                     "Vitya",
                     "AK47",
@@ -97,7 +97,7 @@ class TapController {
                     ""
                 ),
                 User(
-                    "3",
+                    3,
                     "1234509876",
                     "Сисястая",
                     "Стейси",
@@ -108,7 +108,7 @@ class TapController {
             )),
             Game("Темка на лям", listOf(
                 User(
-                    "1",
+                    1,
                     "1234567890",
                     "Жека",
                     "Джопс",
@@ -116,7 +116,7 @@ class TapController {
                     ""
                 ),
                 User(
-                    "2",
+                    2,
                     "0987654321",
                     "Vitya",
                     "AK47",
@@ -124,7 +124,7 @@ class TapController {
                     ""
                 ),
                 User(
-                    "3",
+                    3,
                     "1234509876",
                     "Сисястая",
                     "Стейси",
