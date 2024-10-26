@@ -1,13 +1,12 @@
 ---
 meta:
-  environment: jvm
+  environment: docker
   toolchain:
-    name: gradle
-    version: 17
+    name: docker
+    version: latest
 build:
-  artifacts:
-    build/libs/*.jar: /
+  dockerfile: casinoBackend/Dockerfile
+  skip: false
 run:
-  jarName: main.jar
   persistenceMount: /data
   containerPort: 80
