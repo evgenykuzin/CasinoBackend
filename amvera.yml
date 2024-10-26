@@ -1,12 +1,13 @@
 ---
 meta:
-  environment: docker
+  environment: jvm
   toolchain:
-    name: docker
-    version: latest
+    name: gradle
+    version: 17
 build:
-  dockerfile: Dockerfile
-  skip: false
+  artifacts:
+    build/libs/*.jar: /
 run:
+  jarName: main.jar
   persistenceMount: /data
   containerPort: 80
