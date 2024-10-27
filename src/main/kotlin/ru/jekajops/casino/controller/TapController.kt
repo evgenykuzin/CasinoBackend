@@ -13,7 +13,7 @@ import ru.jekajops.casino.tools.Path
 import ru.jekajops.casino.tools.ROOT
 import ru.jekajops.casino.tools.asPath
 
-@Configuration
+//@Configuration
 class TapController {
 
     val storage = mutableMapOf<String, Any>()
@@ -136,8 +136,8 @@ class TapController {
         )
     }
 
-    @Bean
-    @FlowPreview
+    //@Bean
+    //@FlowPreview
     fun controller() = coRouter {
         infix fun Path.nest(r: CoRouterFunctionDsl.() -> Unit) = asPath.nest(r)
 
