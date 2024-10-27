@@ -19,7 +19,7 @@ class WebConfig
     : WebFluxConfigurer
 {
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:8080")
+        registry.addMapping("/**").allowedOrigins("http://localhost:8080", "0.0.0.0")
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
