@@ -5,7 +5,6 @@ import jakarta.persistence.*
 import org.hibernate.Hibernate
 import java.time.Instant
 import org.springframework.data.relational.core.mapping.Table
-import java.math.BigInteger
 import kotlin.jvm.Transient
 
 @Entity(name = "user_g")
@@ -21,7 +20,7 @@ data class User(
     var username: String? = null,
     var phone: String? = null,
     var avatar: String? = null,
-    var balance: BigInteger = BigInteger.ZERO,
+    var balance: Int = 0,
     var credit: Int = 0,
     var deleted: Boolean = false,
     var timestamp: Instant? = null
@@ -63,7 +62,7 @@ data class Game(
     var adminId: Long? = null,
     var minPlayers: Int = 2,
     var maxPlayers: Int = 5,
-    var minBet: BigInteger = BigInteger.TEN,
+    var minBet: Int = 10,
     var gameType: GameType = GameType.ONE_WINNER,
     //@OneToMany(cascade = [CascadeType.PERSIST])
     //@org.springframework.data.annotation.Transient
@@ -100,7 +99,7 @@ data class Participant(
     @JoinColumn(name = "GAME_ID", referencedColumnName = "ID")
     var game: Game? = null,
     var userId: Long? = null,
-    var betAmount: BigInteger? = null,
+    var betAmount: Int? = null,
     var status: ParticipantStatus = ParticipantStatus.PENDING
 ) {
 
@@ -196,7 +195,7 @@ data class ResultAmount(
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "participantId", referencedColumnName = "id")
     var participant: Participant? = null,
-    var amount: BigInteger? = BigInteger.ZERO
+    var amount: Int? = 0
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

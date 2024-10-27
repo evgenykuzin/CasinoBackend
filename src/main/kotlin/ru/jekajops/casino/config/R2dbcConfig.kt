@@ -15,11 +15,18 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 @Configuration
 @EnableR2dbcRepositories
 class R2dbcConfig : AbstractR2dbcConfiguration() {
+    fun defineDataPath() = when {
+        "mac" in System.getProperty("os.name").lowercase() ->
+            "/Users/anastasia/IdeaProjects/CasinoBackend/data"
+        else ->
+            "/data"
+    }
+
     @Bean
     override fun connectionFactory(): ConnectionFactory =
         H2ConnectionFactory(
             H2ConnectionConfiguration.builder()
-                .file("./src/main/resources/newdb")
+                .file("${defineDataPath()}/newdb")
                 .username("qwe123")
                 .password("qwe123")
                 .build()

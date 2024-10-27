@@ -51,7 +51,7 @@ class GameService {
         gameType: GameType = GameType.ONE_WINNER,
     ): Long {
         try {
-            val game = Game(null, name, adminId, minPlayers, maxPlayers, minBet, gameType)
+            val game = Game(null, name, adminId, minPlayers, maxPlayers, minBet.toInt(), gameType)
             val gameId = gameRepository.save(game).id ?: throw StatusException(-10, "Error while creating game")
             addParticipant(gameId, adminId, minBet)
             return gameId
@@ -65,7 +65,7 @@ class GameService {
         if (game?.let { participantRepository.existsByGameAndUserId(it, userId) } == true) {
             throw StatusException(-30, "you already joined the game")
         }
-        val p = Participant(game = game, userId = userId, betAmount = minBet)
+        val p = Participant(game = game, userId = userId, betAmount = minBet.toInt())
         participantRepository.save(p)
         //game?.participants?.add(p)
         //game?.let { games.save(it) }
@@ -79,7 +79,7 @@ class GameService {
         }
 
         val user = userRepository.findById(userId) ?: throw RuntimeException("Invalid user ID")
-        if (user.balance < betAmount) {
+        if (user.balance < betAmount.toInt()) {
             throw StatusException(-3, "Insufficient balance")
         }
         userRepository.decreaseUserBalance(userId, betAmount)
@@ -111,8 +111,8 @@ class GameService {
                 }
 
                 fun process(winFunction: (p: List<Participant>, tb: BigInteger) -> List<ResultAmount>) {
-                    val totalBet = participants.sumOf { it.betAmount ?: BigInteger.ZERO }
-                    val resultAmounts: List<ResultAmount> = winFunction(participants, totalBet)
+                    val totalBet = participants.sumOf { it.betAmount ?: BigInteger.ZERO.toInt() }
+                    val resultAmounts: List<ResultAmount> = winFunction(participants, totalBet.toBigInteger())
                     val finishedAt = game.startedAt!!.plusSeconds(30)
                     mono {
                         payoutService.payout(resultAmounts)
@@ -135,7 +135,7 @@ class GameService {
                             fun Participant.toResultAmount(percent: Double): ResultAmount {
                                 return ResultAmount(
                                     participant = this,
-                                    amount = totalBet.toBigDecimal().multiply(percent.toBigDecimal()).toBigInteger()
+                                    amount = totalBet.toBigDecimal().multiply(percent.toBigDecimal()).toInt()
                                 )
                             }
 
@@ -159,7 +159,7 @@ class GameService {
                         process { _, totalBet ->
                             val winners = participants.shuffled().take(1)
                             winners.map {
-                                ResultAmount(participant = it, amount = totalBet)
+                                ResultAmount(participant = it, amount = totalBet.toInt())
                             }
                         }
                     }
@@ -204,7 +204,7 @@ class GameService {
                             while (lastAmount > last) {
                                 resultAounts = if (resultAounts.isEmpty()) {
                                     participants.map {
-                                        ResultAmount(participant = it, amount = countAmount().toBigInteger())
+                                        ResultAmount(participant = it, amount = countAmount().toInt())
                                     }
                                 } else {
                                     resultAounts.map { ra ->
@@ -212,7 +212,7 @@ class GameService {
                                             it.amount = countAmount()
                                                 .plus(it.amount?.toBigDecimal() ?: zero)
                                                 .setScale(2, RoundingMode.DOWN)
-                                                .toBigInteger()
+                                                .toInt()
                                         }
                                     }
                                 }
@@ -254,7 +254,7 @@ class GameService {
                             participantRepository.delete(it)
                             //gameRepository.save(game)
                             //participantRepository.delete(it)
-                            userRepository.increaseUserBalance(userId, it.betAmount ?: ZERO)
+                            userRepository.increaseUserBalance(userId, it.betAmount?.toBigInteger() ?: ZERO)
                         }
                     }
                 }
@@ -319,7 +319,7 @@ class PayoutService {
 
     suspend fun payout(resultAmounts: List<ResultAmount>) {
         resultAmounts.forEach { ra ->
-            users.increaseUserBalance(ra.participant?.userId!!, ra.amount ?: ZERO)
+            users.increaseUserBalance(ra.participant?.userId!!, ra.amount?.toBigInteger() ?: ZERO)
         }
     }
 }
@@ -365,7 +365,7 @@ class UsersService {
             firstName = firstName,
             lastName = lastName,
             phone = phone,
-            balance = ZERO,
+            balance = ZERO.toInt(),
             credit = 0,
             deleted = false,
             timestamp = Instant.now()
@@ -396,7 +396,7 @@ class UsersService {
         if (updatedBalance < BigDecimal.ZERO) {
             throw NotEnoughBalanceException(userId = user.id!!)
         }
-        user.balance = updatedBalance.toBigInteger()
+        user.balance = updatedBalance.toInt()
         return users.save(user)
     }
 

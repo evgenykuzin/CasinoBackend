@@ -31,7 +31,7 @@ data class GameDto(
             name,
             minPlayers,
             maxPlayers,
-            minBet,
+            minBet.toBigInteger(),
             gameType,
             startedAt ?: Instant.now(),
             status,
@@ -52,7 +52,7 @@ data class GameDto(
         adminId,
         minPlayers,
         maxPlayers,
-        minBet,
+        minBet.toInt(),
         gameType,
         startedAt,
         status
