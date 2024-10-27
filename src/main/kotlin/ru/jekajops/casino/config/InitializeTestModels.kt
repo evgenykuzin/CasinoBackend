@@ -57,7 +57,7 @@ class ModelInitializationService(
             println(it)
         }.let { users ->
             users.filter {
-                !userRepository.existsById(it.id!!)
+                !userRepository.existsByUsername(it.username!!)
             }.map {
                 println("saving $it")
                 userRepository.save(it.copy(id = null)).also {

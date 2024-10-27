@@ -88,6 +88,7 @@ interface UserRepository
 //        save(game)
 //    }
 
+    suspend fun existsByUsername(username: String): Boolean
 
     suspend fun findByBalanceLessThan(balance: BigInteger): List<User>
 
@@ -99,7 +100,7 @@ interface UserRepository
         "SELECT DISTINCT * FROM User INNER JOIN PARTICIPANT ON User.id = PARTICIPANT.USER_ID" +
                 " WHERE PARTICIPANT.GAME_ID = :gameId"
     )
-    suspend fun findUsersByGameId(@Param("gameId") gameId: Long?): List<User>
+    suspend fun findUsersByGameId(@Param("gameId") gameId: Long?): Flux<User>
 
     @Transactional
     @Modifying

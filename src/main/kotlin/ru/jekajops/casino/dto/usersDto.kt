@@ -16,6 +16,5 @@ data class UserRegistration(
     val phone: String? = null,
     var balance: Double = 0.0,
     val credit: Int = 0,
-    var deleted: Boolean = false,
-    val timestamp: Instant? = null,
+    val timestamp: Instant,
 )

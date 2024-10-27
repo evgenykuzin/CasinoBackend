@@ -17,9 +17,12 @@ class GameController {
     private lateinit var gameService: GameService
 
     @Autowired
+    private lateinit var usersService: UsersService
+
+    @Autowired
     private lateinit var resultsService: ResultsService
 
-    @PostMapping("/create-game")
+    @PostMapping("/createGame")
     suspend fun createGame(
         @RequestBody cg: CreateGame,
     ): ResponseEntity<Response> {
@@ -40,7 +43,7 @@ class GameController {
         }
     }
 
-    @PostMapping("/join-game")
+    @PostMapping("/joinGame")
     suspend fun joinGame(
         @RequestBody jg: JoinGame,
     ): ResponseEntity<Response> {
@@ -51,7 +54,7 @@ class GameController {
         }
     }
 
-    @GetMapping("/start-game")
+    @GetMapping("/startGame")
     suspend fun startGame(@RequestParam gameId: String): ResponseEntity<Response> {
         return response {
             println("startGame: $gameId")
@@ -60,7 +63,7 @@ class GameController {
         }
     }
 
-    @GetMapping("/leave-game")
+    @GetMapping("/leaveGame")
     suspend fun leaveGame(@RequestParam gameId: String, @RequestParam userId: String): ResponseEntity<Response> {
         return response {
             println("leaveGame: gmid=$gameId; usid=$userId")
@@ -77,22 +80,29 @@ class GameController {
         }
     }
 
-    @GetMapping("/get-all")
+    @GetMapping("/getAll")
     suspend fun getAvailableGames(): ResponseEntity<Flux<GameDto>> {
         println("getAvailableGames")
         return ResponseEntity.ok((gameService.getAvailableGames())).print()
     }
 
-    @GetMapping("/get-my")
+    @GetMapping("/getMy")
     suspend fun getMyGames(@RequestParam userId: String): ResponseEntity<Flux<GameDto>> {
         println("getMyGames")
         return ResponseEntity.ok(gameService.getMyGames(userId.toLong())).print()
     }
 
-    @GetMapping("/get-active")
+    @GetMapping("/getActive")
     suspend fun getActiveGames(@RequestParam userId: String): ResponseEntity<Flux<GameDto>> {
         println("getActiveGames")
         return ResponseEntity.ok(gameService.getActiveGames(userId.toLong())).print()
+    }
+
+    @GetMapping("/participants")
+    suspend fun getParticipants(@RequestParam gameId: Long) {
+        usersService.getUsersOfGame(gameId).let {
+            ResponseEntity.ok(ok(it))
+        }
     }
 
     @DeleteMapping("/delete")

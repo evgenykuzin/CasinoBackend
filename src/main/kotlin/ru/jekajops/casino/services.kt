@@ -3,8 +3,10 @@ package ru.jekajops.casino
 import dev.inmo.micro_utils.common.ifTrue
 import dev.inmo.micro_utils.coroutines.launchSynchronously
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactor.asFlux
 import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -385,8 +387,8 @@ class UsersService {
         return users.findByTelegramId(telegramId)
     }
 
-    suspend fun getAllUsers(): List<User> {
-        return users.findAll().toList()
+    suspend fun getAllUsers(): Flux<User> {
+        return users.findAll().asFlux()
     }
 
     suspend fun updateBalance(telegramId: String, amount: BigDecimal): User? {
@@ -400,7 +402,7 @@ class UsersService {
         return users.save(user)
     }
 
-    suspend fun getUsersOfGame(gameId: Long): List<User> {
+    suspend fun getUsersOfGame(gameId: Long): Flux<User> {
         return users.findUsersByGameId(gameId)
     }
 

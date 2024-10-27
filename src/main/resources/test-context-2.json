@@ -88,9 +88,9 @@
     {
       "id": 1,
       "telegramId": 12345,
-      "firstName": "John",
-      "lastName": "Doe",
-      "username": "johndoe",
+      "firstName": "Danya",
+      "lastName": "Bondarenko",
+      "username": "danyarohnin",
       "phone": "+1234567890",
       "balance": 100.0,
       "credit": 0,
@@ -99,12 +99,23 @@
     {
       "id": 2,
       "telegramId": 67890,
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "username": "janedoe",
+      "firstName": "Tyoma",
+      "lastName": "",
+      "username": "tyoma",
       "phone": "+0987654321",
       "balance": 200.0,
       "credit": 50,
+      "deleted": false
+    },
+    {
+      "id": 3,
+      "telegramId": 65903,
+      "firstName": "Jeka",
+      "lastName": "Kuzin",
+      "username": "jekajops",
+      "phone": "+0987456901",
+      "balance": 500.0,
+      "credit": 0,
       "deleted": false
     }
   ]

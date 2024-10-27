@@ -7,9 +7,9 @@ import ru.jekajops.casino.UsersService
 
 @Configuration
 class ControllerConfiguration {
-
-    @Bean
-    @FlowPreview
-    fun usersControllerBean(userService: UsersService) = usersController(userService)
+//
+//    @Bean
+//    @FlowPreview
+//    fun usersControllerBean(userService: UsersService) = usersController(userService)
 
 }
