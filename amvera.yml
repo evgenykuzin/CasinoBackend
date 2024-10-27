@@ -10,4 +10,4 @@ build:
 run:
   jarName: CasinoTemka-1.0-SNAPSHOT.jar
   persistenceMount: /data
-  containerPort: 80
+  containerPort: 8080
