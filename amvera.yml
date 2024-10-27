@@ -8,6 +8,6 @@ build:
   artifacts:
     build/libs/*.jar: /
 run:
-  jarName: main.jar
+  jarName: CasinoTemka-1.0-SNAPSHOT.jar
   persistenceMount: /data
   containerPort: 80
