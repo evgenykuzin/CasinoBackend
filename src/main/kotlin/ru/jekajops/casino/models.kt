@@ -19,7 +19,6 @@ data class User(
     var lastName: String? = null,
     var username: String? = null,
     var phone: String? = null,
-    var avatar: String? = null,
     var balance: Int = 0,
     var credit: Int = 0,
     var deleted: Boolean = false,
@@ -68,7 +67,7 @@ data class Game(
     //@org.springframework.data.annotation.Transient
 //    var participants: MutableList<Participant>? = null,
     var startedAt: Instant? = null,
-    var status: GameStatus = GameStatus.CREATED
+    var status: GameStatus = GameStatus.CREATED,
 ) {
 
     override fun equals(other: Any?): Boolean {

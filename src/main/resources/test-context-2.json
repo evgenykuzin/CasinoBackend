@@ -2,84 +2,116 @@
   "games": [
     {
       "id": 1,
-      "name": "Game1",
-      "adminId": "13",
+      "name": "Хули нам)",
+      "adminId": 3,
       "minPlayers": 2,
       "maxPlayers": 5,
-      "minBet": 10,
+      "minBet": 20,
       "gameType": "ONE_WINNER",
+      "inGameNow": 3,
       "participants": [
         {
           "gameId": 1,
           "userId": 1,
-          "betAmount": 10.0,
-          "status": "PENDING"
+          "betAmount": 20.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/1/avatar.jpg"
         },
         {
           "gameId": 1,
-          "userId": 2,
+          "userId": 3,
           "betAmount": 20.0,
-          "status": "PENDING"
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/3/avatar.jpg"
+        },
+        {
+          "gameId": 1,
+          "userId": 4,
+          "betAmount": 20.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/4/avatar.jpg"
         }
       ],
       "status": "CREATED"
     },
     {
       "id": 2,
-      "name": "Game2",
-      "adminId": 1,
+      "name": "Залупошники",
+      "adminId": 3,
       "minPlayers": 3,
       "maxPlayers": 6,
       "minBet": 200,
       "gameType": "TOP3_WINNERS",
+      "inGameNow": 3,
       "participants": [
         {
           "gameId": 2,
-          "userId": 1,
+          "userId": 3,
           "betAmount": 200.0,
-          "status": "PENDING"
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/1/avatar.jpg"
         },
         {
           "gameId": 2,
           "userId": 2,
-          "betAmount": 300.0,
-          "status": "PENDING"
+          "betAmount": 200.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/2/avatar.jpg"
         },
         {
           "gameId": 2,
-          "userId": 13,
+          "userId": 5,
           "betAmount": 200.0,
-          "status": "PENDING"
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/5/avatar.jpg"
         }
       ],
       "status": "CREATED"
     },
     {
       "id": 3,
-      "name": "Game3",
-      "adminId": 13,
+      "name": "Мутка",
+      "adminId": 4,
       "minPlayers": 3,
       "maxPlayers": 4,
-      "minBet": 100,
+      "minBet": 1000,
       "gameType": "RANDOM_WINNERS",
+      "inGameNow": 3,
       "participants": [
         {
           "gameId": 3,
           "userId": 1,
-          "betAmount": 200.0,
-          "status": "PENDING"
+          "betAmount": 1000.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/1/avatar.jpg"
+        },
+        {
+          "gameId": 3,
+          "userId": 4,
+          "betAmount": 1000.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/4/avatar.jpg"
+        },
+        {
+          "gameId": 3,
+          "userId": 3,
+          "betAmount": 1000.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/3/avatar.jpg"
         },
         {
           "gameId": 3,
           "userId": 2,
-          "betAmount": 300.0,
-          "status": "PENDING"
+          "betAmount": 1000.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/2/avatar.jpg"
         },
         {
           "gameId": 3,
-          "userId": 13,
-          "betAmount": 200.0,
-          "status": "PENDING"
+          "userId": 5,
+          "betAmount": 1000.0,
+          "status": "PENDING",
+          "avatar": "http://temka-jekajops.amvera.io/data/users/5/avatar.jpg"
         }
       ]
     }
@@ -90,11 +122,12 @@
       "telegramId": 12345,
       "firstName": "Danya",
       "lastName": "Bondarenko",
-      "username": "danyarohnin",
-      "phone": "+1234567890",
-      "balance": 100.0,
+      "username": "Kiyoshi_Ronin",
+      "phone": "89821034245",
+      "balance": 10000.0,
       "credit": 0,
-      "deleted": false
+      "deleted": false,
+      "avatar": "http://temka-jekajops.amvera.io/data/users/1/avatar.jpg"
     },
     {
       "id": 2,
@@ -105,7 +138,8 @@
       "phone": "+0987654321",
       "balance": 200.0,
       "credit": 50,
-      "deleted": false
+      "deleted": false,
+      "avatar": "http://temka-jekajops.amvera.io/data/users/2/avatar.jpg"
     },
     {
       "id": 3,
@@ -113,10 +147,35 @@
       "firstName": "Jeka",
       "lastName": "Kuzin",
       "username": "jekajops",
-      "phone": "+0987456901",
+      "phone": "89523663611",
+      "balance": 50000.0,
+      "credit": 0,
+      "deleted": false,
+      "avatar": "http://temka-jekajops.amvera.io/data/users/3/avatar.jpg"
+    },
+    {
+      "id": 4,
+      "telegramId": 21453,
+      "firstName": "Iluxa",
+      "lastName": null,
+      "username": "Altezzache",
+      "phone": "8987456911",
+      "balance": 7000.0,
+      "credit": 0,
+      "deleted": false,
+      "avatar": "http://temka-jekajops.amvera.io/data/users/4/avatar.jpg"
+    },
+    {
+      "id": 5,
+      "telegramId": 21453,
+      "firstName": "Aleksey",
+      "lastName": null,
+      "username": "lexus_666",
+      "phone": "8666454311",
       "balance": 500.0,
       "credit": 0,
-      "deleted": false
+      "deleted": false,
+      "avatar": "http://temka-jekajops.amvera.io/data/users/5/avatar.jpg"
     }
   ]
 }

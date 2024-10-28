@@ -1,5 +1,7 @@
 package ru.jekajops.casino
 
+import kotlinx.coroutines.flow.Flow
+import org.springframework.data.domain.Pageable
 import org.springframework.data.r2dbc.repository.Modifying
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -75,7 +77,9 @@ interface ParticipantRepository
 
     suspend fun existsByGameAndUserId(game: Game, userId: Long): Boolean
 
-   // suspend fun participants(game: Game): Flux<Participant>? = game.id?.let { findAllByGame_Id(it) }
+    //suspend fun findAll(pageable: Pageable): Flow<Participant>
+
+    // suspend fun participants(game: Game): Flux<Participant>? = game.id?.let { findAllByGame_Id(it) }
 }
 
 @Repository

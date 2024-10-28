@@ -80,7 +80,7 @@ class GameController {
         }
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getAllAvailable")
     suspend fun getAvailableGames(): ResponseEntity<Flux<GameDto>> {
         println("getAvailableGames")
         return ResponseEntity.ok((gameService.getAvailableGames())).print()
