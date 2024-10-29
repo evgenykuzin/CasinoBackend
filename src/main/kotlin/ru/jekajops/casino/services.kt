@@ -270,12 +270,10 @@ class GameService {
     suspend fun Game.toDto(): GameDto = participants(id!!)
         .toList()
         .let {
-            println("list of p: $it")
             this.toDto(it.toMutableList())
         }
 
     suspend fun <I : Flow<Game>> I.mapToDto(): Flow<GameDto> = map {
-        println("game: $it")
         it.toDto()
     }
 

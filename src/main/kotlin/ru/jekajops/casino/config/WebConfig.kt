@@ -16,10 +16,15 @@ import org.springframework.web.server.WebFilter
 @Configuration
 @EnableWebFlux
 class WebConfig
-    : WebFluxConfigurer
-{
+    : WebFluxConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:8080", "0.0.0.0")
+        registry.addMapping("/**")
+            .allowedOrigins(
+                "http://localhost:8080",
+                "0.0.0.0",
+                "http://temka-jekajops.amvera.io",
+                "https://appery.io"
+            )
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
