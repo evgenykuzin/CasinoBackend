@@ -268,18 +268,19 @@ class GameService {
     suspend fun participants(gameId: Long) = participantRepository
         .findAllByGame_Id(gameId)
         .collectList()
-        .block() ?: mutableListOf()
 
-    suspend fun Game.toDto() = toDto(participants(id!!))
-
-    suspend fun <I : Flux<Game>> I.mapToDto() = map {
-        launchSynchronously { it.toDto() }
+    suspend fun Game.toDtoMono() = participants(id!!).map {
+        toDto(it)
     }
 
-    suspend fun getGame(gameId: Long): GameDto {
+    suspend fun <I : Flux<Game>> I.mapToDto() = flatMap {
+        launchSynchronously { it.toDtoMono() }
+    }
+
+    suspend fun getGame(gameId: Long): Mono<GameDto> {
         return gameRepository
             .findById(gameId)
-            ?.toDto() ?: throw StatusException(-4, "Invalid game ID")
+            ?.toDtoMono() ?: throw StatusException(-4, "Invalid game ID")
     }
 
     suspend fun getAvailableGames(): Flux<GameDto> {
