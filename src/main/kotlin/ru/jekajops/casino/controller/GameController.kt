@@ -1,10 +1,12 @@
 package ru.jekajops.casino.controller
 
+import kotlinx.coroutines.flow.Flow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import print
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Hooks
 import ru.jekajops.casino.*
 import ru.jekajops.casino.dto.CreateGame
 import ru.jekajops.casino.dto.GameDto
@@ -73,27 +75,34 @@ class GameController {
     }
 
     @GetMapping("/get")
-    suspend fun getGame(@RequestParam gameId: String): ResponseEntity<Response> {
-        return response {
+    suspend fun getGame(@RequestParam gameId: String): ResponseEntity<GameDto> {
+        return run {
             println("getGame: $gameId")
-            ResponseEntity.ok(ok(gameService.getGame(gameId.toLong()))).print()
+            ResponseEntity.ok(gameService.getGame(gameId.toLong())).print()
         }
     }
 
+    @GetMapping("/getAll")
+    suspend fun getAll(): ResponseEntity<Flow<GameDto>> {
+        println("getAll")
+        return ResponseEntity.ok((gameService.getAllGames())).print()
+    }
+
     @GetMapping("/getAllAvailable")
-    suspend fun getAvailableGames(): ResponseEntity<Flux<GameDto>> {
+    suspend fun getAvailableGames(): ResponseEntity<Flow<GameDto>> {
         println("getAvailableGames")
+        Hooks.onOperatorDebug();
         return ResponseEntity.ok((gameService.getAvailableGames())).print()
     }
 
     @GetMapping("/getMy")
-    suspend fun getMyGames(@RequestParam userId: String): ResponseEntity<Flux<GameDto>> {
+    suspend fun getMyGames(@RequestParam userId: String): ResponseEntity<Flow<GameDto>> {
         println("getMyGames")
         return ResponseEntity.ok(gameService.getMyGames(userId.toLong())).print()
     }
 
     @GetMapping("/getActive")
-    suspend fun getActiveGames(@RequestParam userId: String): ResponseEntity<Flux<GameDto>> {
+    suspend fun getActiveGames(@RequestParam userId: String): ResponseEntity<Flow<GameDto>> {
         println("getActiveGames")
         return ResponseEntity.ok(gameService.getActiveGames(userId.toLong())).print()
     }

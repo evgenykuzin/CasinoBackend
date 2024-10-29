@@ -1,11 +1,8 @@
 package ru.jekajops.casino
 
 import dev.inmo.micro_utils.common.ifTrue
-import dev.inmo.micro_utils.coroutines.launchSynchronously
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.asFlux
 import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,9 +10,9 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import ru.jekajops.casino.dto.GameDto
-import ru.jekajops.casino.dto.GameDto.Companion.mapToDto
 import ru.jekajops.casino.dto.GameDto.Companion.toDto
 import ru.jekajops.casino.tools.sizeOrZero
+import ru.jekajops.casino.tools.toMono
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.BigInteger.ZERO
@@ -42,7 +39,7 @@ class GameService {
 
     private inline fun <R> withParticipantsRepo(f: ParticipantRepository.() -> R): R = with(participantRepository, f)
 
-    suspend fun Game.participants() = withParticipantsRepo { id?.let { findAllByGame_Id(it) } }
+    suspend fun Game.participants() = withParticipantsRepo { id?.let { findAllByGameId(it) } }
 
     suspend fun createGame(
         name: String,
@@ -64,10 +61,10 @@ class GameService {
 
     suspend fun addParticipant(gameId: Long, userId: Long, minBet: BigInteger) {
         val game = gameRepository.findById(gameId)
-        if (game?.let { participantRepository.existsByGameAndUserId(it, userId) } == true) {
+        if (game?.let { participantRepository.existsByGameIdAndUserId(it, userId) } == true) {
             throw StatusException(-30, "you already joined the game")
         }
-        val p = Participant(game = game, userId = userId, betAmount = minBet.toInt())
+        val p = Participant(gameId = game?.id, userId = userId, betAmount = minBet.toInt())
         participantRepository.save(p)
         //game?.participants?.add(p)
         //game?.let { games.save(it) }
@@ -90,7 +87,7 @@ class GameService {
 
         game.participants()
             ?.count()
-            ?.map { participantsCount ->
+            ?.let { participantsCount ->
                 (participantsCount >= game.minPlayers).ifTrue {
                     mono {
                         startGame(gameId)
@@ -99,12 +96,12 @@ class GameService {
             }
     }
 
-    suspend fun startGame(gameId: Long): Mono<Game>? {
+    suspend fun startGame(gameId: Long): Game? {
         return kotlin.runCatching {
             val game = gameRepository.findById(gameId) ?: throw StatusException(-4, "Invalid game ID")
             gameRepository.updateStatusById(GameStatus.IN_PROGRESS, gameId)
-            game.participants()?.collectList()?.map {
-                val participants: List<Participant> = it?.shuffled() ?: mutableListOf()
+            (game.participants()?.toList() ?: mutableListOf()).let {
+                val participants: List<Participant> = it.shuffled().toMutableList()
 
                 game.startedAt = Instant.now()
 
@@ -223,13 +220,15 @@ class GameService {
                         }
                     }
                 }
-                game.also {
-                    game.status = GameStatus.COMPLETE
+                game.status = GameStatus.COMPLETE
+                mono {
                     gameRepository.updateStatusById(game.status, gameId)
+                }.flatMap {
                     mono {
                         participantRepository.deleteAll(participants)
-                    }.subscribe()
-                }
+                    }
+                }.subscribe()
+                game
             }
         }.onSuccess {
             Thread.sleep(30000)
@@ -266,41 +265,49 @@ class GameService {
     }
 
     suspend fun participants(gameId: Long) = participantRepository
-        .findAllByGame_Id(gameId)
-        .collectList()
+        .findAllByGameId(gameId)
 
-    suspend fun Game.toDtoMono() = participants(id!!).map {
-        toDto(it)
+    suspend fun Game.toDto(): GameDto = participants(id!!)
+        .toList()
+        .let {
+            println("list of p: $it")
+            this.toDto(it.toMutableList())
+        }
+
+    suspend fun <I : Flow<Game>> I.mapToDto(): Flow<GameDto> = map {
+        println("game: $it")
+        it.toDto()
     }
 
-    suspend fun <I : Flux<Game>> I.mapToDto() = flatMap {
-        launchSynchronously { it.toDtoMono() }
-    }
-
-    suspend fun getGame(gameId: Long): Mono<GameDto> {
+    suspend fun getGame(gameId: Long): GameDto {
         return gameRepository
             .findById(gameId)
-            ?.toDtoMono() ?: throw StatusException(-4, "Invalid game ID")
+            ?.toDto() ?: throw StatusException(-4, "Invalid game ID")
     }
 
-    suspend fun getAvailableGames(): Flux<GameDto> {
-        return gameRepository.findByMaxPlayersGreaterThan().mapToDto()
+    suspend fun getAllGames(): Flow<GameDto> {
+        return gameRepository.findAll().mapToDto()
     }
 
-    suspend fun getMyGames(userId: Long): Flux<GameDto> {
+    suspend fun getAvailableGames(): Flow<GameDto> {
+        return gameRepository.findAllAvailable().mapToDto()
+    }
+
+    suspend fun getMyGames(userId: Long): Flow<GameDto> {
         return gameRepository.findByAdminId(userId).mapToDto()
     }
 
-    suspend fun getActiveGames(userId: Long): Flux<GameDto> {
+    suspend fun getActiveGames(userId: Long): Flow<GameDto> {
         return participantRepository.findByUserId(userId).flatMap {
-            it.getGameId()?.let { id ->
+            it.gameId?.let { id ->
                 mono {
                     gameRepository.findById(id)
                 }
             }
         }.filter {
             it.status in setOf(GameStatus.CREATED, GameStatus.IN_PROGRESS)
-        }.mapToDto()
+        }.asFlow()
+            .mapToDto()
     }
 
     suspend fun deleteGame(gameId: Long) {
@@ -337,7 +344,7 @@ class ResultsService {
 
     @Autowired
     private lateinit var results: ResultRepository
-    fun getResults(gameId: Long): Result? {
+    suspend fun getResults(gameId: Long): Result? {
         return results.findTopByGameId(gameId)
     }
 

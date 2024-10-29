@@ -5,16 +5,18 @@ import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.DependsOn
 import org.springframework.stereotype.Service
 import ru.jekajops.casino.*
 
 @OptIn(DelicateCoroutinesApi::class)
 @Configuration
-@ConditionalOnBean(R2dbcConfig::class)
+@DependsOn("databaseInitializer")
 class InitializeTestModels {
     @Autowired
     lateinit var modelInitializationService: ModelInitializationService
@@ -78,12 +80,14 @@ class ModelInitializationService(
                 gameRepository.save(it.toEntity().copy(id = null)).also { saved ->
                     println("game saved: $saved")
                     println("saving participants: ${participants}")
-                    participants?.map { p ->
+                    participants.map { p ->
                         println("participat in game: $p")
-                        p.game = saved
+                        p.gameId = saved.id
                         p
-                    }?.let { pList ->
-                        participantRepository.saveAll(pList)
+                    }.forEach {
+                        participantRepository.save(it).also {
+                            println("Saved participant ($it)")
+                        }
                     }
                 }
             }

@@ -24,9 +24,12 @@ interface GameRepository
 
 
     @Query("select * from Game g where max_players > (select count(game_id) from participant where game_id = g.id) and started_at is null and status = 'CREATED'")
-    fun findByMaxPlayersGreaterThan(): Flux<Game>
+    suspend fun findByMaxPlayersGreaterThan(): Flux<Game>
 
-    fun findByAdminId(adminId: Long): Flux<Game>
+    @Query("select * from Game g where max_players > (select count(game_id) from participant where game_id = g.id) and status <> 'COMPLETE'")
+    suspend fun findAllAvailable(): Flow<Game>
+
+    suspend fun findByAdminId(adminId: Long): Flow<Game>
 
 //    fun findByParticipants_UserIdAndStatusIn(
 //        participants_userId: Long,
@@ -39,9 +42,9 @@ interface GameRepository
     @Transactional
     @Modifying
     @org.springframework.data.r2dbc.repository.Query("update Game g set g.status = ?1 where g.id = ?2")
-    fun updateStatusById(status: GameStatus, id: Long)
+    suspend fun updateStatusById(status: GameStatus, id: Long)
 
-    fun findAllByStatusIn(status: MutableCollection<GameStatus>)
+    suspend fun findAllByStatusIn(status: MutableCollection<GameStatus>)
 
 }
 
@@ -55,7 +58,7 @@ interface ResultRepository
 //        save(game)
 //    }
 
-    fun findTopByGameId(gameId: Long): Result?
+    suspend fun findTopByGameId(gameId: Long): Result?
 
 }
 
@@ -71,11 +74,11 @@ interface ParticipantRepository
 //        save(game)
 //    }
 
-    fun findTopByGame(game: Game): Participant?
+    suspend fun findTopByGameId(game: Long): Participant?
 
-    suspend fun findAllByGame_Id(gameId: Long): Flux<Participant>
+    suspend fun findAllByGameId(gameId: Long): Flow<Participant>
 
-    suspend fun existsByGameAndUserId(game: Game, userId: Long): Boolean
+    suspend fun existsByGameIdAndUserId(game: Game, userId: Long): Boolean
 
     //suspend fun findAll(pageable: Pageable): Flow<Participant>
 
